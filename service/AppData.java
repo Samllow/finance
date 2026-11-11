@@ -7,7 +7,7 @@ import java.util.HashMap;
 public class AppData {
     
     private Map<String, Account> accounts = new HashMap<>();
-    
+
     public void addAccount(String login, Account account) {
         accounts.put(login, account);
     }
@@ -15,5 +15,7 @@ public class AppData {
     public Account findAccount(String login) {
         return accounts.get(login);        
     }
+
+    
 
 }

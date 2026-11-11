@@ -32,7 +32,7 @@ public class AuthService {
         if(appData.findAccount(login).isPasswordCorrect(password) == false){
             return 1;
         }
-
+        
         return 0;
     }
 }
