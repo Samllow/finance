@@ -2,7 +2,9 @@ package service;
 import model.Account;
 
 import java.util.Map;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class AppData {
     
@@ -16,4 +18,11 @@ public class AppData {
         return accounts.get(login);        
     }
 
+    public List<Account> getAllAccounts(){
+        List<Account> accountList = new ArrayList<>();
+        for (Map.Entry<String, Account> entry : accounts.entrySet()) {
+            accountList.add(entry.getValue());
+        }
+        return accountList;
+    }
 }

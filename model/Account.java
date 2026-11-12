@@ -21,6 +21,6 @@ public class Account {
         return false;
     }
 
-
+    public String getPassword(){ return password;}
     
 }

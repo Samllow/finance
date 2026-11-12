@@ -78,7 +78,23 @@ public class AppController {
         }
         
     }
-    //TODO: private void handleShowReports() {}
+    private void handleShowReports() {
+        ui.printMessage("Куда вывести отчёт?");
+        ui.printMessage("<c>: в консоль");
+        ui.printMessage("<f>: в файл");
+
+        char choise = ui.readChar("Выберите оберацию: ");
+
+        switch (choise) {
+            case 'c': ui.printWalletReport(currentAccount); break;
+            case 'f': //TODO Реализовать StorageService
+                ui.printMessage("Сохранение очёта в файл");
+                break;
+            default:
+                ui.printError("Неверный набор");
+        }
+
+    }
     //TODO: private void handleLogout() {}
     //TODO: private void handleTransfer() {}
     private void printGuestMenu() {
@@ -91,7 +107,7 @@ public class AppController {
         ui.printMessage("\n=== ЛИЧНЫЙ КАБИНЕТ (" + currentAccount.getLoggin() + ") ===");
         ui.printMessage("<i>: Добавить доход");
         ui.printMessage("<e>: Добавить расход");
-        //ui.printMessage("<s>: Показать финансовый отчёт");
+        ui.printMessage("<s>: Показать финансовый отчёт");
         // ui.printMessage("<t>: Перевести деньги другому пользователю");
         //ui.printMessage("<l>: Выйти из аккаунта (Logout)");
         ui.printMessage("<q>: Выйти из приложения");
@@ -127,9 +143,9 @@ public class AppController {
                 switch (choise) {
                     case 'i': handleAddIncome(); break;
                     case 'e': handleAddExpense(); break;
-                    case 's': //TODO: hanleShowReport(); break;
-                    case 't': //TODO: handleTransfer(); break;
-                    case 'l': //TODO: handleLogout(); break;
+                    case 's': handleShowReports(); break;
+                    //case 't': TODO: handleTransfer(); break;
+                    //case 'l': TODO: handleLogout(); break;
                     case 'q':
                         ui.printMessage("Сохранение данных и выход");
                         //TODO: Вызвать FileStorageService.save() перед выходом

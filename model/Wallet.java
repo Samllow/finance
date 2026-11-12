@@ -45,14 +45,16 @@ public class Wallet {
         return expenses;
     }
 
-    public double calculateIncomeByCategory(List<Category> categories){
-        double result = 0;
+    public Map<Category, Double> calculateIncomeByCategory(Set<Category> categories){
+        Map<Category, Double> incomes = new HashMap<>();
         for (Transaction transaction : transactions) {
-            if (categories.contains(transaction.getCategory()) && transaction instanceof Income)
-            { result += transaction.getAmount(); }
+            if (transaction instanceof Income && categories.contains(transaction.getCategory())) {
+                Category cat = transaction.getCategory();
+                double currentSum = incomes.getOrDefault(cat, 0.0);
+                incomes.put(cat, currentSum + transaction.getAmount());
+            }
         }
-            
-        return result;
+        return incomes;
     }
 
     public double getBalance(double income, double expense){
@@ -83,4 +85,5 @@ public class Wallet {
         return null;
     }
 
+    public List<Transaction> getTransactions(){return transactions;}
 }
