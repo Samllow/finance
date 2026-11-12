@@ -75,4 +75,12 @@ public class Wallet {
         return categories;
     }
     
+    public Category getExpenseCategory(String categoryName){
+        Set<Category> categories = getExpenseCategories();
+        for (Category category : categories) {
+            if (category.getName().equals(categoryName)) return category;
+        }
+        return null;
+    }
+
 }

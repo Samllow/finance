@@ -4,9 +4,9 @@ import model.Account;
 public class AuthService {
     private AppData appData;
 
-    // public AuthService(AppData appData){
-    //     this.appData = appData;
-    // }
+    public AuthService(AppData appData){
+        this.appData = appData;
+    }
 
     public boolean createAccount(String login, String password) {
         

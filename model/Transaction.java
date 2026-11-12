@@ -15,6 +15,6 @@ public abstract class Transaction {
     abstract public double getEffect();
 
     public double getAmount(){ return amount;}
-    public LocalDateTime getDate(){return date;}
-    public Category getCategory(){return category;}
+    public LocalDateTime getDate(){ return date; }
+    public Category getCategory(){ return category; }
 }

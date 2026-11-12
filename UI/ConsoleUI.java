@@ -50,6 +50,20 @@ public class ConsoleUI {
         }
     }
 
+    public char readChar(String prompt){
+        while (true) {
+            System.out.println(prompt);
+            String input = scanner.nextLine().trim();
+            if (!input.isEmpty()) {
+                return input.charAt(0);
+            }else{
+                System.out.println("Вы ничего не ввели.");
+                continue;
+            }
+        }
+
+    }
+
     public void printWalletReport(Account account) {
         Wallet wallet = account.getWallet();
         System.out.println("===ДОХОДЫ===");

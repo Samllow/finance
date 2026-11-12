@@ -26,13 +26,14 @@ public class TransactionService {
         return new OperationResult(true, null);
     }
 
-    public OperationResult addExpense(String login, double value, LocalDateTime date, Category category) {
+    public OperationResult addExpense(String login, double value, LocalDateTime date, String categoryName) {
         Account account = appData.findAccount(login);
 
         if (account == null) return new OperationResult(false, "Пользователь не существует");
         if (value <= 0) {
             return new OperationResult(false, "Введите число большее чем 0");
         }
+        Category category = account.getWallet().getExpenseCategory(categoryName);
         if (category == null) {
             return new OperationResult(false, "Эта категория не существует");
         }
@@ -54,4 +55,5 @@ public class TransactionService {
         public boolean getResult() { return success;}
         public String getErrorMessage() {return errorMessage;}
     }
+
 }

@@ -16,6 +16,4 @@ public class AppData {
         return accounts.get(login);        
     }
 
-    
-
 }
