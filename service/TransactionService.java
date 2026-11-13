@@ -1,6 +1,9 @@
 package service;
 import java.time.LocalDateTime;
+import java.util.Set;
+
 import model.Income;
+import model.Wallet;
 import model.Account;
 import model.Category;
 import model.Expense;
@@ -35,12 +38,31 @@ public class TransactionService {
         }
         Category category = account.getWallet().getExpenseCategory(categoryName);
         if (category == null) {
-            return new OperationResult(false, "Эта категория не существует");
+            category = new Category(categoryName, 0.0);
+            // return new OperationResult(false, "Эта категория не существует");
         }
 
         account.getWallet()
             .addTransaction(new Expense(value, date, category));
         return new OperationResult(true, null);
+    }
+
+    public OperationResult updateCategoryLimit(String login, String categoryName, double newLimit) {
+        Account account = appData.findAccount(login);
+        if (account == null) { return new OperationResult(false, "Пользователь не найден");}
+        if (newLimit < 0) {return new OperationResult(false, "\nЛимит не может быть отрицательным\n");}
+        Wallet wallet = account.getWallet();
+        Category category = wallet.getExpenseCategory(categoryName);
+        if (category == null){
+            return new OperationResult(false, "\nКатегория не найдена. Сначала добавьте расход по этой категории.\n");
+        }
+        category.setLimit(newLimit);
+
+        //double currentSpent = TODO: 
+
+
+        return new OperationResult(true, "Лимит для категории '" + categoryName + "' успешно обновлён!");
+
     }
 
     public class OperationResult {

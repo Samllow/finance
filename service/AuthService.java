@@ -11,7 +11,7 @@ public class AuthService {
     public boolean createAccount(String login, String password) {
         
         if (appData.findAccount(login) != null) {
-            return false;            
+            return false;
         }
         
 

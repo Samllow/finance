@@ -2,11 +2,14 @@ package UI;
 
 import model.Account;
 import model.Category;
+import model.Wallet;
 import service.AuthService;
+import service.StorageService;
 import service.TransactionService;
 import service.TransactionService.OperationResult;
 import service.AppData;
 import java.time.LocalDateTime;
+import java.util.Set;
 
 public class AppController {
     private final ConsoleUI ui;
@@ -14,12 +17,16 @@ public class AppController {
     private final TransactionService transactionService;
     private final AppData appData;
     private Account currentAccount;
+    private StorageService storageService;
 
-    public AppController(ConsoleUI ui, AuthService authService, TransactionService transactionService, AppData appData) {
+    public AppController(ConsoleUI ui, AuthService authService, 
+        TransactionService transactionService, AppData appData, 
+        StorageService storageService) {
         this.ui = ui;
         this.authService = authService;
         this.transactionService = transactionService;
         this.appData = appData;
+        this.storageService = storageService;
     }
 
     private void handleLogin() {
@@ -36,6 +43,7 @@ public class AppController {
             case 0:
                 ui.printMessage("Добро пожаловать!");
                 currentAccount = appData.findAccount(userName);
+                currentAccount.getWallet().addObserver(ui);
                 break;
             default:
                 break;
@@ -45,7 +53,7 @@ public class AppController {
         String userName = ui.readString("Введите имя: ");
         String password = ui.readString("Введите пароль: ");
         boolean creationAnswer = authService.createAccount(userName, password);
-        String attention = creationAnswer ? "Успешно зарегистрировано" : "Ошибка регистрации";
+        String attention = creationAnswer ? "Успешно зарегистрировано" : "Ошибка регистрации. Аккаунт с таким именем уже существует";
         if (creationAnswer) {
             ui.printMessage(attention);
             currentAccount = appData.findAccount(attention);
@@ -63,9 +71,8 @@ public class AppController {
     private void handleAddExpense() {
         String categoryName = ui.readString("Введите категорию затраты: ");
         double value = ui.readDouble("Введите сумму затраты: ");
-        Category category;
         OperationResult result = transactionService.addExpense(
-            categoryName,
+            currentAccount.getLoggin(),
             value,
             LocalDateTime.now(), 
             categoryName
@@ -87,7 +94,7 @@ public class AppController {
 
         switch (choise) {
             case 'c': ui.printWalletReport(currentAccount); break;
-            case 'f': //TODO Реализовать StorageService
+            case 'f': 
                 ui.printMessage("Сохранение очёта в файл");
                 break;
             default:
@@ -95,8 +102,39 @@ public class AppController {
         }
 
     }
-    //TODO: private void handleLogout() {}
+    private void handleLogout(){
+        if (currentAccount != null){
+            ui.printMessage("Пользователь " + currentAccount.getLoggin() + " вышел из системы.");
+            storageService.save(appData);
+            this.currentAccount = null;
+
+        } else{ ui.printError("Вы и так не авторизованы."); }
+    }
     //TODO: private void handleTransfer() {}
+    private void handleUpdateBudget() {
+        Wallet wallet = currentAccount.getWallet();
+
+        Set<Category> categories = wallet.getExpenseCategories();
+        if (categories.isEmpty()){
+            ui.printMessage("У вас пока нет категорий расходов. Добавьте хотя бы один расход.");
+            return;
+        }
+
+        ui.printMessage("\n--- ТЕКУЩИЕ БЮДЖЕТЫ ---");
+        for (Category cat : categories) {
+            ui.printMessage("  " + cat.getName() + " | Лимит: " + cat.getLimit());            
+        }
+        String categoryName = ui.readString("\nВведите название категории для изменения (или Enter для отмены): ");
+        if (categoryName.isBlank()) {return;}
+        double newLimit = ui.readDouble("Введите новый лимит: ");
+        OperationResult result = transactionService.updateCategoryLimit(currentAccount.getLoggin(), categoryName, newLimit);
+        
+        if (result.getResult()) {
+            ui.printMessage(result.getErrorMessage());
+        } else {
+            ui.printError(result.getErrorMessage());
+        }
+    }
     private void printGuestMenu() {
         ui.printMessage("\n=== ГЛАВНОЕ МЕНЮ ===");
         ui.printMessage("<l>: Войти в систему");
@@ -107,11 +145,13 @@ public class AppController {
         ui.printMessage("\n=== ЛИЧНЫЙ КАБИНЕТ (" + currentAccount.getLoggin() + ") ===");
         ui.printMessage("<i>: Добавить доход");
         ui.printMessage("<e>: Добавить расход");
-        ui.printMessage("<s>: Показать финансовый отчёт");
+        ui.printMessage("<v>: Показать финансовый отчёт");
+        ui.printMessage("<b>: Изменить бюджет");
         // ui.printMessage("<t>: Перевести деньги другому пользователю");
-        //ui.printMessage("<l>: Выйти из аккаунта (Logout)");
+        ui.printMessage("<l>: Выйти из аккаунта (Logout)");
         ui.printMessage("<q>: Выйти из приложения");
     }
+    
     public void start(){
         ui.printMessage("=== HELLO WORLD ===");
 
@@ -133,7 +173,8 @@ public class AppController {
                 switch (choise) {
                     case 'l': handleLogin(); break;
                     case 'r': handleRegistration(); break;
-                    case 'q': 
+                    case 'q':
+                        storageService.save(appData); 
                         ui.printMessage("До свидания!");
                         return;
                     default:
@@ -143,12 +184,13 @@ public class AppController {
                 switch (choise) {
                     case 'i': handleAddIncome(); break;
                     case 'e': handleAddExpense(); break;
-                    case 's': handleShowReports(); break;
+                    case 'v': handleShowReports(); break;
+                    case 'b': handleUpdateBudget(); break;
                     //case 't': TODO: handleTransfer(); break;
-                    //case 'l': TODO: handleLogout(); break;
+                    case 'l': handleLogout(); break;
                     case 'q':
                         ui.printMessage("Сохранение данных и выход");
-                        //TODO: Вызвать FileStorageService.save() перед выходом
+                        storageService.save(appData);
                         return;
                     default:
                         ui.printError("Неверный пункт меню");
