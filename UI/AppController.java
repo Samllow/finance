@@ -95,6 +95,7 @@ public class AppController {
         switch (choise) {
             case 'c': ui.printWalletReport(currentAccount); break;
             case 'f': 
+                storageService.load(appData);
                 ui.printMessage("Сохранение очёта в файл");
                 break;
             default:

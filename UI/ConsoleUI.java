@@ -93,6 +93,7 @@ public class ConsoleUI implements BudgetObserver {
             System.out.printf("%s : %.2f , Оставшийся бюджет: %.2f\n", cat.getName(), spent, remaining);
 
         }
+        System.out.println("\nАктуальный баланс: " + wallet.getBalance(totalIncome, totalExpenses));
     }
     
     public void printCategories(Set<Category> categories) {
