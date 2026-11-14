@@ -37,7 +37,7 @@ public class TransactionService {
         }
         Category category = account.getWallet().getExpenseCategory(categoryName);
         if (category == null) {
-            category = new Category(categoryName, 0.0);
+            category = new Category(categoryName, value);
             // return new OperationResult(false, "Эта категория не существует");
         }
 
